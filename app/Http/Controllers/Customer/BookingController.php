@@ -8,6 +8,7 @@ use App\Models\Product;
 use App\Models\Booking;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class BookingController extends Controller
 {
@@ -93,10 +94,29 @@ class BookingController extends Controller
 
         return back()->with('success', 'Status updated and product availability synchronized.');
     }
-    public function DetailBooking($id)
-    {
-        $booking = Booking::with(['user', 'product'])->findOrFail($id);
 
-        return view('frontend.admin.booking.detail', compact('booking'));
+
+    public function submitPayment(Request $request, $id)
+    {
+        $request->validate([
+            'payment_proof' => 'required|image|mimes:jpeg,png,jpg|max:2048', 
+        ]);
+
+        $booking = Booking::findOrFail($id);
+
+        if ($request->hasFile('payment_proof')) {
+            if ($booking->payment_proof) {
+                Storage::disk('public')->delete($booking->payment_proof);
+            }
+            $path = $request->file('payment_proof')->store('payments', 'public');
+
+            $booking->update([
+                'payment_proof' => $path,
+                'payment_status' => 'verifying' 
+            ]);
+           
+        }
+
+        return back()->with('success', 'Payment proof uploaded. Please wait for verification.');
     }
 }

@@ -11,60 +11,51 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <style>
-      body { font-family: 'Inter', sans-serif; color: #333; }
-        
-        /* Navbar & Hamburger Only */
-        .navbar-toggler {
-            padding: 0; width: 30px; height: 30px; position: relative;
-            transition: .5s ease-in-out; cursor: pointer;
-        }
-        .navbar-toggler span {
-            display: block; position: absolute; height: 2px; width: 100%;
-            background: #000; border-radius: 9px; transition: .25s ease-in-out;
-        }
-        .navbar-toggler span:nth-child(1) { top: 6px; }
-        .navbar-toggler span:nth-child(2) { top: 14px; }
-        .navbar-toggler span:nth-child(3) { top: 22px; }
-        .navbar-toggler[aria-expanded="true"] span:nth-child(1) { top: 14px; transform: rotate(135deg); }
-        .navbar-toggler[aria-expanded="true"] span:nth-child(2) { opacity: 0; left: -40px; }
-        .navbar-toggler[aria-expanded="true"] span:nth-child(3) { top: 14px; transform: rotate(-135deg); }
+    :root {
+        --nav-height: 70px;
+    }
 
-        @media (max-width: 991.98px) {
-            .navbar-collapse { background-color: white; padding: 20px 0; text-align: center; }
-        }
+    body {
+        /* Memberikan ruang agar konten profil tidak tertutup navbar */
+        padding-top: calc(var(--nav-height) + 20px);
+    }
 
-        footer { border-top: 1px solid #eee; padding: 40px 0; font-size: 0.7rem; letter-spacing: 1px; color: #888; }
-        .navbar {
+    .navbar {
         height: var(--nav-height);
-        background: rgba(255, 255, 255, 0.8) !important;
+        background: rgba(255, 255, 255, 0.9) !important;
         backdrop-filter: blur(15px);
         -webkit-backdrop-filter: blur(15px);
         border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-        transition: all 0.3s ease;
-        }
+    }
 
+    /* Menghilangkan panah dropdown agar lebih clean */
+    .dropdown-toggle::after {
+        display: none;
+    }
+
+    .nav-profile-img {
+        width: 40px;
+        height: 40px;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 2px solid #fff;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        transition: transform 0.3s ease;
+    }
+
+    .nav-profile-img:hover {
+        transform: scale(1.05);
+    }
+
+    @media (max-width: 576px) {
         .navbar-brand {
-            font-size: 1.1rem;
-            letter-spacing: 1px;
-            color: var(--archive-black) !important;
+            font-size: 0.9rem; /* Ukuran teks logo lebih kecil di HP */
         }
-
         .nav-profile-img {
-            width: 38px;
-            height: 38px;
-            object-fit: cover;
-            border-radius: 50%;
-            border: 2px solid #fff;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            width: 35px;
+            height: 35px;
         }
-
-        .dropdown-menu {
-            border: none !important;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.08) !important;
-            border-radius: 12px !important;
-            margin-top: 15px !important;
-        }
-
+    }
     </style>
     @yield('extra-css')
 </head>

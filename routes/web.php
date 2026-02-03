@@ -8,6 +8,7 @@ use App\Http\Controllers\ProdukController;
 use App\Http\Controllers\DashboardbokingController;
 use App\Http\Controllers\Customer\CatalogController;
 use App\Http\Controllers\Customer\BookingController;
+USE App\Http\Controllers\Customer\ProfilController;
 use App\Http\Controllers\landingpage\CataloglandingController;
 use App\Http\Controllers\CustomerdashboardController;
 
@@ -53,6 +54,11 @@ Route::prefix('customer')->middleware(['auth', 'role:CUSTOMER'])->group(function
     Route::post('/booking/{product}', [BookingController::class, 'store'])->name('customer.booking.store');
     Route::get('/my-archives', [BookingController::class, 'index'])->name('customer.rental.index');
     Route::get('/rental/detail/{id}', [BookingController::class, 'showBooking'])->name('customer.user.rental.detail');
+    Route::post('/rental/payment/{id}', [BookingController::class, 'submitPayment'])->name('customer.payment.submit');
+    // profil
+    Route::get('/profil', [ProfilController::class, 'index'])->name('customer.profil.index');
+    Route::get('/profil/edit', [ProfilController::class, 'edit'])->name('customer.profil.edit');
+    Route::put('/profil/update', [ProfilController::class, 'update'])->name('customer.profil.update');
 });
 
 

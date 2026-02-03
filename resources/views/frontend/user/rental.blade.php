@@ -36,13 +36,13 @@
     .payment-label { font-size: 0.6rem; font-weight: 800; text-transform: uppercase; padding: 3px 8px; border-radius: 2px; margin-left: 10px; display: inline-flex; align-items: center; gap: 4px; vertical-align: middle; }
     .pay-unpaid { background: #fff5f5; color: var(--accent-unpaid); border: 1px solid #feb2b2; }
     .pay-paid { background: #f0fff4; color: var(--accent-paid); border: 1px solid #c6f6d5; }
+    .pay-verifying { background: #eff6ff; color: var(--accent-verifying); border: 1px solid #bfdbfe; }
 
     .booking-id-text { font-family: 'Monaco', 'Consolas', monospace; font-size: 0.75rem; color: #2563eb; background: #eff6ff; padding: 2px 8px; font-weight: 700; }
     .item-name { font-weight: 700; font-size: 1.1rem; text-transform: uppercase; margin-top: 5px; color: #000; text-decoration: none; }
     .info-label { font-size: 0.7rem; text-transform: uppercase; color: #888; font-weight: 700; display: block; }
     .info-value { font-size: 0.9rem; font-weight: 600; }
 
-    /* --- WA Button --- */
     .btn-wa { background-color: #25D366; color: white; border: none; transition: 0.3s; }
     .btn-wa:hover { background-color: #128C7E; color: white; }
 </style>
@@ -69,15 +69,14 @@
                             @php
                                 $images = is_array($booking->product->images) ? $booking->product->images : json_decode($booking->product->images, true);
                                 $img = (!empty($images)) ? asset('storage/' . $images[0]) : 'https://via.placeholder.com/120x160';
-                                
                                 $formatted_id = '#B-' . str_pad($booking->id, 4, '0', STR_PAD_LEFT);
 
-                                // Logic Pesan WhatsApp
+                                // WA Number & Message
                                 $wa_number = "62895366602581"; 
-                                $message = "Halo Admin, saya ingin konfirmasi pembayaran untuk booking " . $formatted_id . ".\n\n" .
+                                $message = "Halo Admin, saya ingin menanyakan status booking " . $formatted_id . ".\n\n" .
                                            "Item: " . $booking->product->name . "\n" .
                                            "Total: Rp " . number_format($booking->total_price, 0, ',', '.') . "\n" .
-                                           "Mohon segera diproses. Terima kasih.";
+                                           "Terima kasih.";
                                 $wa_url = "https://wa.me/" . $wa_number . "?text=" . urlencode($message);
                             @endphp
                             <img src="{{ $img }}" class="product-thumb" alt="Item">
@@ -88,12 +87,13 @@
                                 <div>
                                     <span class="booking-id-text">{{ $formatted_id }}</span>
                                     
-                                    @if(in_array($booking->status, ['approved', 'returned', 'completed']))
-                                        @if($booking->status == 'returned' || $booking->status == 'completed')
-                                            <span class="payment-label pay-paid"><i class="bi bi-patch-check-fill"></i> Paid</span>
-                                        @else
-                                            <span class="payment-label pay-unpaid"><i class="bi bi-exclamation-circle-fill"></i> Unpaid</span>
-                                        @endif
+                                    {{-- LOGIKA PEMBAYARAN --}}
+                                    @if($booking->payment_status == 'paid')
+                                        <span class="payment-label pay-paid"><i class="bi bi-patch-check-fill"></i> Paid</span>
+                                    @elseif($booking->payment_status == 'verifying')
+                                        <span class="payment-label pay-verifying"><i class="bi bi-clock-history"></i> Verifying</span>
+                                    @elseif($booking->status == 'approved')
+                                        <span class="payment-label pay-unpaid"><i class="bi bi-exclamation-circle-fill"></i> Unpaid</span>
                                     @endif
 
                                     <a href="{{ route('customer.user.rental.detail', $booking->id) }}" class="item-name d-block">{{ $booking->product->name }}</a>
@@ -119,16 +119,29 @@
                                 </div>
                                 <div class="col-6 col-md-3 mt-3 mt-md-0 text-md-end d-flex gap-2 justify-content-end align-items-end">
                                     
-                                    {{-- Tombol WhatsApp: Hanya Muncul Jika Status PENDING --}}
                                     @if($booking->status == 'pending')
-                                        <a href="{{ $wa_url }}" target="_blank" class="btn btn-wa btn-sm rounded-0 px-3 fw-bold shadow-sm" title="Konfirmasi Pembayaran">
-                                            <i class="bi bi-whatsapp me-1"></i> Confirm
+                                        <a href="{{ $wa_url }}" target="_blank" class="btn btn-wa btn-sm rounded-0 px-3 fw-bold shadow-sm">
+                                            <i class="bi bi-whatsapp me-1"></i> Chat Admin
                                         </a>
                                     @endif
 
-                                    <a href="{{ route('customer.user.rental.detail', $booking->id) }}" class="btn btn-outline-dark btn-sm rounded-0 px-3 fw-bold small text-uppercase">
-                                        Details
-                                    </a>
+                                    {{-- DINAMISASI TOMBOL BERDASARKAN STATUS BAYAR --}}
+                                    @if($booking->payment_status == 'paid')
+                                        {{-- Jika sudah dibayar (Approved oleh Admin) --}}
+                                        <a href="{{ route('customer.user.rental.detail', $booking->id) }}" class="btn btn-outline-success btn-sm rounded-0 px-3 fw-bold small text-uppercase shadow-sm">
+                                            <i class="bi bi-receipt me-1"></i> View Receipt
+                                        </a>
+                                    @elseif($booking->status == 'approved' && $booking->payment_status != 'verifying')
+                                        {{-- Jika disetujui admin tapi belum bayar --}}
+                                        <a href="{{ route('customer.user.rental.detail', $booking->id) }}" class="btn btn-dark btn-sm rounded-0 px-4 fw-bold small text-uppercase shadow">
+                                            <i class="bi bi-wallet2 me-1"></i> Pay Now
+                                        </a>
+                                    @else
+                                        {{-- Default tombol detail --}}
+                                        <a href="{{ route('customer.user.rental.detail', $booking->id) }}" class="btn btn-outline-dark btn-sm rounded-0 px-3 fw-bold small text-uppercase">
+                                            Details
+                                        </a>
+                                    @endif
                                 </div>
                             </div>
                         </div>
@@ -147,4 +160,5 @@
     <div class="pagination-wrapper mt-4 d-flex justify-content-center">
         {{ $bookings->links('pagination::bootstrap-5') }}
     </div>
+</div>
 @endsection

@@ -30,7 +30,7 @@ public function index(Request $request)
             $query->where('year_made', $request->year);
         }
 
-        $products = $query->latest()->paginate(10);
+        $products = $query->latest()->paginate(5);
 
         $colors = Product::distinct()->pluck('color')->filter()->sort();
         $occasions = Product::distinct()->pluck('occasion')->filter()->sort();

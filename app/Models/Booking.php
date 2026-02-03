@@ -19,6 +19,8 @@ class Booking extends Model
         'status',
         'occasion', 
         'venue',    
+        'payment_proof',   
+        'payment_status',  
     ];
 
     protected $casts = [

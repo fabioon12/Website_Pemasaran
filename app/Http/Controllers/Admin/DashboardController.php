@@ -12,7 +12,7 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        $totalRevenue = Booking::where('status', 'approved')->sum('total_price');
+        $totalRevenue = Booking::where('payment_status', 'paid')->sum('total_price');
         $totalBookings = Booking::count();
         $pendingCount = Booking::where('status', 'pending')->count();
         $productsCount = Product::count();

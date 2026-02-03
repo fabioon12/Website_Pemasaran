@@ -107,7 +107,6 @@ class ProdukController extends Controller
 
 
         if ($request->hasFile('images')) {
-            // Hapus foto lama
             if ($product->images) {
                 foreach ($product->images as $oldImage) {
                     Storage::disk('public')->delete($oldImage);

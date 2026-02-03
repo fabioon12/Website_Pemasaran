@@ -5,10 +5,8 @@
 @section('admin-content')
 
 <style>
-   
     body { font-family: 'Inter', sans-serif; background-color: var(--bg-body); color: var(--text-main); }
     
-
     .header-title h2 { font-weight: 800; letter-spacing: -1px; color: var(--text-main); }
     .card { 
         border: 1px solid var(--border-color); 
@@ -35,7 +33,6 @@
         border-radius: 20px; 
     }
     
-    /* tumpang tindih dropdown */
     .table-responsive { 
         overflow: visible !important; 
     }
@@ -53,21 +50,45 @@
         color: var(--text-muted); 
     }
 
-    /* Elements */
+    /* Search Bar Adjustment - PERBAIKAN DI SINI */
+    .search-container {
+        max-width: 320px;
+        position: relative;
+    }
+    .search-input {
+        padding-left: 40px !important;
+        padding-right: 15px;
+        border-radius: 12px !important;
+        border: 1px solid var(--border-color);
+        background: var(--bg-body);
+        height: 40px;
+        font-size: 0.85rem;
+        transition: all 0.2s ease;
+    }
+    .search-input:focus {
+        border-color: #2563eb;
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+        background: var(--bg-card);
+    }
+    .search-container i.bi-search {
+        left: 15px;
+        color: #94a3b8;
+        font-size: 0.9rem;
+        pointer-events: none;
+    }
+
     .img-product { width: 42px; height: 56px; object-fit: cover; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
     .avatar-client { width: 38px; height: 38px; border-radius: 10px; background: var(--bg-body); color: var(--accent-color); font-weight: 700; }
     .booking-id { font-family: 'Monaco', 'Consolas', monospace; color: #2563eb; background: rgba(37, 99, 235, 0.1); padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; }
     
-    /* Status Badges */
     .badge-status {
         padding: 6px 16px; border-radius: 50px; font-size: 0.65rem; font-weight: 800;
         display: inline-flex; align-items: center; gap: 6px; letter-spacing: 0.3px;
     }
     .status-pending { background: rgba(245, 158, 11, 0.1); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.2); }
-    .status-approved { background: rgba(25, 135, 84, 0.1); color: #198754; border: 1px solid rgba(25, 135, 84, 0.2); }
+    .status-approved { background: rgba(0, 0, 0, 0.05); color: #000; border: 1px solid rgba(0,0,0,0.1); }
     .status-returned { background: var(--bg-body); color: var(--text-muted); border: 1px solid var(--border-color); }
 
-    /* Action Buttons */
     .btn-action { 
         width: 34px; height: 34px; border-radius: 8px; display: inline-flex; 
         align-items: center; justify-content: center; transition: 0.2s; 
@@ -75,65 +96,17 @@
         color: var(--text-main);
     }
     .btn-approve { background: #198754 !important; color: white !important; border: none; }
+    .btn-verify { background: #0d6efd !important; color: white !important; border: none; }
     .btn-reject { color: #dc3545; }
-    .btn-more { color: var(--text-muted); }
 
-    /* Dropdown Styling */
-    .dropdown-menu { 
-        background-color: var(--bg-card);
-        border: 1px solid var(--border-color); 
-        box-shadow: 0 10px 25px rgba(0,0,0,0.2); 
-        border-radius: 12px; padding: 8px; min-width: 180px; z-index: 1060;
-    }
-    .dropdown-item { 
-        padding: 10px 12px; border-radius: 8px; font-size: 0.85rem; 
-        font-weight: 500; display: flex; align-items: center; color: var(--text-main);
-    }
-    .dropdown-item i { font-size: 1.1rem; margin-right: 10px; }
-    .dropdown-item:hover { background-color: var(--bg-body); color: var(--accent-color); }
-
-    /* Search Bar */
-    .search-input { 
-        padding-left: 40px !important; border-radius: 10px; 
-        border: 1px solid var(--border-color); background: var(--bg-body);
-        color: var(--text-main);
-    }
-
-    @media (max-width: 768px) {
-        .stat-card h3 { font-size: 1.25rem; }
-    }
-     /* Styling Payment Status yang Lebih Modern */
     .pay-badge {
-        padding: 4px 10px;
-        border-radius: 8px;
-        font-size: 0.65rem;
-        font-weight: 700;
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-        letter-spacing: 0.5px;
+        padding: 4px 10px; border-radius: 8px; font-size: 0.65rem;
+        font-weight: 700; display: inline-flex; align-items: center; gap: 5px;
     }
-
-    /* Status: Waiting */
-    .pay-waiting {
-        background: rgba(108, 117, 125, 0.1);
-        color: #6c757d;
-        border: 1px dashed rgba(108, 117, 125, 0.3);
-    }
-
-    /* Status: Belum Bayar */
-    .pay-unpaid-new {
-        background: rgba(220, 53, 69, 0.1);
-        color: #dc3545;
-        border: 1px solid rgba(220, 53, 69, 0.2);
-    }
-
-    /* Status: Sudah Bayar */
-    .pay-paid-new {
-        background: rgba(25, 135, 84, 0.1);
-        color: #198754;
-        border: 1px solid rgba(25, 135, 84, 0.2);
-    }
+    .pay-waiting { background: rgba(108, 117, 125, 0.1); color: #6c757d; border: 1px dashed rgba(108, 117, 125, 0.3); }
+    .pay-unpaid-new { background: rgba(220, 53, 69, 0.1); color: #dc3545; border: 1px solid rgba(220, 53, 69, 0.2); }
+    .pay-paid-new { background: rgba(25, 135, 84, 0.1); color: #198754; border: 1px solid rgba(25, 135, 84, 0.2); }
+    .pay-verifying { background: rgba(13, 110, 253, 0.1); color: #0d6efd; border: 1px solid rgba(13, 110, 253, 0.2); }
 </style>
 
 <div class="container-fluid py-4">
@@ -202,10 +175,19 @@
     <div class="table-container shadow-sm mb-5">
         <div class="px-4 py-3 border-bottom d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3">
             <h6 class="m-0 fw-bold d-flex align-items-center"><i class="bi bi-clock-history me-2 text-muted"></i>Recent Transactions</h6>
-            <div class="position-relative search-container" style="min-width: 280px;">
-                <i class="bi bi-search position-absolute top-50 translate-middle-y ms-3 text-muted"></i>
-                <input type="text" id="searchInput" class="form-control form-control-sm search-input" placeholder="Search booking...">
-            </div>
+            
+            {{-- SEARCH FORM - FIXED LAYOUT --}}
+        <form action="{{ route('admin.booking.index') }}" method="GET" class="search-container position-relative" style="min-width: 300px;">
+                {{-- Ikon diletakkan secara absolut --}}
+                <i class="bi bi-search position-absolute" style="left: 15px; top: 50%; transform: translateY(-50%); color: #94a3b8; z-index: 10;"></i>
+                
+                <input type="text" 
+                    name="search" 
+                    value="{{ request('search') }}" 
+                    class="form-control" 
+                    placeholder="Ketik ID atau Nama..."
+                    style="padding-left: 40px; border-radius: 10px; height: 40px;">
+            </form>
         </div>
         
         <div class="table-responsive">
@@ -258,52 +240,56 @@
                             </div>
                         </td>
                         <td><div class="fw-bold text-main">Rp {{ number_format($item->total_price, 0, ',', '.') }}</div></td>
+                        
                         <td>
-                            @if($item->status == 'pending')
-                                <div class="pay-badge pay-waiting">
-                                    <i class="bi bi-clock-history"></i>
-                                    <span>WAITING APPROVED</span>
+                            @if($item->payment_status == 'verifying')
+                                <div class="pay-badge pay-verifying">
+                                    <i class="bi bi-shield-check"></i> VERIFYING
                                 </div>
-                            @elseif($item->status == 'approved')
-                                <div class="pay-badge pay-unpaid-new">
-                                    <i class="bi bi-exclamation-circle-fill"></i>
-                                    <span>UNPAID</span>
-                                </div>
-                            @elseif($item->status == 'returned')
+                            @elseif($item->payment_status == 'paid')
                                 <div class="pay-badge pay-paid-new">
-                                    <i class="bi bi-check-all"></i>
-                                    <span>PAID</span>
+                                    <i class="bi bi-check-circle-fill"></i> PAID
+                                </div>
+                            @elseif($item->status == 'pending')
+                                <div class="pay-badge pay-waiting">
+                                    <i class="bi bi-clock-history"></i> WAITING
                                 </div>
                             @else
-                                <span class="text-muted small">-</span>
+                                <div class="pay-badge pay-unpaid-new">
+                                    <i class="bi bi-exclamation-circle-fill"></i> UNPAID
+                                </div>
                             @endif
                         </td>
+
                         <td>
                             <span class="badge-status status-{{ strtolower($item->status) }}">
                                 <i class="bi bi-{{ $item->status == 'pending' ? 'hourglass-split' : ($item->status == 'approved' ? 'check-all' : 'box-arrow-in-left') }}"></i>
                                 {{ strtoupper($item->status) }}
                             </span>
                         </td>
+
                         <td class="text-end pe-4">
                             <div class="d-flex justify-content-end align-items-center gap-2">
+                                @if($item->payment_status == 'verifying')
+                                    <button class="btn-action btn-verify" data-bs-toggle="modal" data-bs-target="#verifyModal{{ $item->id }}" title="Verify Payment">
+                                        <i class="bi bi-cash-stack"></i>
+                                    </button>
+                                @endif
+
                                 @if($item->status == 'pending')
-                                <form action="{{ route('admin.bookings.update-status', [$item->id, 'approved']) }}" method="POST" class="m-0 d-inline">
-                                    @csrf @method('PATCH')
-                                    <button type="submit" class="btn-action btn-approve" title="Approve"><i class="bi bi-check-lg"></i></button>
-                                </form>
-                                <form action="{{ route('admin.bookings.update-status', [$item->id, 'rejected']) }}" method="POST" class="m-0 d-inline">
-                                    @csrf @method('PATCH')
-                                    <button type="submit" class="btn-action btn-reject" title="Reject"><i class="bi bi-x"></i></button>
-                                </form>
+                                    <form action="{{ route('admin.bookings.update-status', [$item->id, 'approved']) }}" method="POST" class="m-0">
+                                        @csrf @method('PATCH')
+                                        <button type="submit" class="btn-action btn-approve" title="Approve"><i class="bi bi-check-lg"></i></button>
+                                    </form>
                                 @endif
                                 
                                 <div class="dropdown d-inline">
-                                    <button class="btn-action btn-more" type="button" data-bs-toggle="dropdown" data-bs-boundary="viewport">
+                                    <button class="btn-action btn-more" type="button" data-bs-toggle="dropdown">
                                         <i class="bi bi-three-dots-vertical"></i>
                                     </button>
                                     <ul class="dropdown-menu dropdown-menu-end shadow-lg">
                                         <li><a class="dropdown-item" href="{{ route('admin.bookings.detail', $item->id) }}"><i class="bi bi-eye"></i> View Details</a></li>
-                                        @if($item->status == 'approved')
+                                        @if($item->status == 'approved' && $item->payment_status == 'paid')
                                         <li>
                                             <form action="{{ route('admin.bookings.update-status', [$item->id, 'returned']) }}" method="POST" class="m-0">
                                                 @csrf @method('PATCH')
@@ -313,13 +299,39 @@
                                             </form>
                                         </li>
                                         @endif
-                                        <li><hr class="dropdown-divider"></li>
-                                        <li><a class="dropdown-item text-danger" href="#"><i class="bi bi-trash3"></i> Delete Log</a></li>
                                     </ul>
                                 </div>
                             </div>
                         </td>
                     </tr>
+
+                    {{-- Modal Verifikasi Pembayaran --}}
+                    @if($item->payment_status == 'verifying')
+                    <div class="modal fade" id="verifyModal{{ $item->id }}" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; background: var(--bg-card); color: var(--text-main);">
+                                <div class="modal-header border-0">
+                                    <h6 class="fw-bold m-0">Payment Proof #B-{{ $item->id }}</h6>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body text-center">
+                                    <p class="small text-muted mb-3">Sender: <strong>{{ $item->user->name }}</strong></p>
+                                    <img src="{{ asset('storage/' . $item->payment_proof) }}" class="img-fluid rounded-3 border mb-3" style="max-height: 400px;">
+                                    <div class="alert alert-info py-2 text-start small border-0" style="background: rgba(13, 110, 253, 0.1); color: #0d6efd;">
+                                        <i class="bi bi-info-circle me-2"></i> Nominal harus sesuai: <strong>Rp {{ number_format($item->total_price, 0, ',', '.') }}</strong>
+                                    </div>
+                                </div>
+                                <div class="modal-footer border-0">
+                                    <form action="{{ route('admin.bookings.update-status', [$item->id, 'paid']) }}" method="POST" class="w-100">
+                                        @csrf @method('PATCH')
+                                        <button type="submit" class="btn btn-success w-100 fw-bold rounded-3 py-2">ACCEPT PAYMENT</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    @endif
+
                     @empty
                     <tr><td colspan="8" class="text-center py-5 text-muted">No transactions found.</td></tr>
                     @endforelse
@@ -341,14 +353,6 @@
 
 <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
 <script>
-    document.getElementById('searchInput').addEventListener('keyup', function() {
-        let filter = this.value.toLowerCase();
-        let rows = document.querySelectorAll('#bookingTable tbody tr');
-        rows.forEach(row => {
-            row.style.display = row.innerText.toLowerCase().includes(filter) ? '' : 'none';
-        });
-    });
-
     function exportBookingToExcel() {
         var table = document.getElementById("bookingTable");
         var wb = XLSX.utils.table_to_book(table, { sheet: "Reports" });

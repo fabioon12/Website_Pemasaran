@@ -59,14 +59,14 @@
     }
     .hero-title { font-size: 3.5rem; font-weight: 800; letter-spacing: -1px; text-transform: uppercase; margin-bottom: 5px; }
     .hero-subtitle { font-size: 0.85rem; color: var(--archive-text-muted); letter-spacing: 4px; text-transform: uppercase; margin-bottom: 25px; }
-
+    
     .search-container { max-width: 500px; margin: 0 auto 30px; position: relative; }
     .search-input { 
         width: 100%; padding: 12px 20px; border: 1px solid var(--archive-border); border-radius: 0; 
         font-size: 0.8rem; letter-spacing: 1px; outline: none; transition: 0.3s;
     }
     .search-input:focus { border-color: #000; background: #fafafa; }
-
+    /* Filter Section */
     .filter-wrapper {
         background: var(--archive-gray);
         border-radius: 12px;
@@ -103,9 +103,17 @@
     .status-dot { width: 7px; height: 7px; background: #28a745; border-radius: 50%; display: inline-block; margin-right: 6px; }
     .reveal { opacity: 0; transform: translateY(30px); transition: 0.8s cubic-bezier(0.2, 1, 0.3, 1); }
     .reveal.active { opacity: 1; transform: translateY(0); }
+     /* --- Pagination --- */
+    .pagination-container { margin-top: 80px; padding-top: 40px; border-top: 1px solid var(--archive-border); }
+    .pagination .page-item .page-link {
+        background: transparent; border: 1px solid transparent; color: var(--archive-black);
+        font-size: 0.75rem; font-weight: 700; padding: 8px 16px; text-transform: uppercase;
+        letter-spacing: 1px; transition: all 0.3s ease;
+    }
+    .pagination .page-item.active .page-link { background-color: var(--archive-black); color: #fff; border-color: var(--archive-black); }
 </style>
 
-<div class="container pb-5 mt-5">
+<div class="container pb-5">
 
     <section class="hero-section">
         <h1 class="hero-title">The Archive</h1>
@@ -233,9 +241,12 @@
         @endforelse
     </div>
 
-    <div class="d-flex justify-content-center mt-5">
-        {{ $products->appends(request()->query())->links() }}
-    </div>
+    {{-- PAGINATION --}}
+    @if($products->hasPages())
+        <div class="pagination-container d-flex justify-content-center">
+            {{ $products->appends(request()->query())->links('pagination::bootstrap-5') }}
+        </div>
+    @endif
 </div>
 
 <script>

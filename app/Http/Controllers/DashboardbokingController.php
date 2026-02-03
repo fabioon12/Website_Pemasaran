@@ -17,19 +17,24 @@ class DashboardbokingController extends Controller
             $search = $request->search;
 
             $query->where(function($q) use ($search) {
-           
-                if (is_numeric($search)) {
-                    $q->where('id', $search);
+
+                $cleanId = preg_replace('/[^0-9]/', '', $search); 
+
+                if (is_numeric($cleanId)) {
+                    $q->where('id', $cleanId);
+                    
+                    $q->orWhereHas('user', function($userQuery) use ($search) {
+                        $userQuery->where('name', 'like', '%' . $search . '%');
+                    });
+                } else {
+                 
+                    $q->whereHas('user', function($userQuery) use ($search) {
+                        $userQuery->where('name', 'like', '%' . $search . '%');
+                    })
+                    ->orWhereHas('product', function($productQuery) use ($search) {
+                        $productQuery->where('name', 'like', '%' . $search . '%');
+                    });
                 }
-
-                $q->orWhereHas('user', function($userQuery) use ($search) {
-                    $userQuery->where('name', 'like', '%' . $search . '%');
-                });
-
-        
-                $q->orWhereHas('product', function($productQuery) use ($search) {
-                    $productQuery->where('name', 'like', '%' . $search . '%');
-                });
             });
         }
 
@@ -38,7 +43,7 @@ class DashboardbokingController extends Controller
         
        
         $totalBookings = Booking::count();
-        $totalRevenue = Booking::whereIn('status', ['approved', 'returned'])->sum('total_price');
+        $totalRevenue = Booking::where('payment_status', 'paid')->sum('total_price');
         $pendingCount = Booking::where('status', 'pending')->count();
 
         return view('frontend.admin.booking.index', compact(
@@ -54,33 +59,38 @@ class DashboardbokingController extends Controller
         $booking = Booking::with('product')->findOrFail($id);
         $oldStatus = $booking->status;
 
-        $allowedStatuses = ['pending', 'approved', 'rejected', 'returned'];
+        $allowedStatuses = ['pending', 'approved', 'rejected', 'returned', 'paid'];
         if (!in_array($status, $allowedStatuses)) {
             return back()->with('error', 'Invalid status update.');
         }
 
-        if ($oldStatus === $status) {
-            return back()->with('info', 'Status is already ' . strtoupper($status));
-        }
-
         DB::transaction(function () use ($booking, $status, $oldStatus) {
+         
+            if ($status == 'paid') {
+                $booking->update([
+                    'payment_status' => 'paid'
+                ]);
             
-            if ($status == 'approved' && $oldStatus == 'pending') {
-                $booking->product->increment('wear_count');
-            }
+                if($booking->status == 'pending') {
+                    $booking->update(['status' => 'approved']);
+                }
+            } else {
+                // Logika Increment/Decrement yang sudah Anda buat
+                if ($status == 'approved' && $oldStatus == 'pending') {
+                    $booking->product->increment('wear_count');
+                }
+                if ($status == 'rejected' && $oldStatus == 'pending') {
+                    $booking->product->increment('stock', 1);
+                }
+                if ($status == 'returned' && $oldStatus == 'approved') {
+                    $booking->product->increment('stock', 1);
+                }
 
-            if ($status == 'rejected' && $oldStatus == 'pending') {
-                $booking->product->increment('stock', 1);
+                $booking->update(['status' => $status]);
             }
-
-            if ($status == 'returned' && $oldStatus == 'approved') {
-                $booking->product->increment('stock', 1);
-            }
-
-            $booking->update(['status' => $status]);
         });
 
-        return back()->with('success', 'Booking #' . str_pad($booking->id, 4, '0', STR_PAD_LEFT) . ' updated to ' . strtoupper($status));
+        return back()->with('success', 'Status updated successfully.');
     }
     public function DetailBooking($id)
     {

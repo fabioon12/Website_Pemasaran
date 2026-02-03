@@ -10,7 +10,9 @@ class CatalogController extends Controller
 {
    public function index(Request $request)
     {
-        $query = Product::query()->where('is_published', true);
+        $query = Product::query()
+            ->withCount('bookings') 
+            ->where('is_published', true);
 
         if ($request->filled('search')) {
             $query->where('name', 'like', '%' . $request->search . '%');
@@ -29,14 +31,14 @@ class CatalogController extends Controller
         }
 
 
-        $publishedOnly = Product::where('is_published', true);
+        $products = $query->latest()->paginate(5);
 
-        $colors = (clone $publishedOnly)->distinct()->pluck('color')->filter()->sort();
-        $occasions = (clone $publishedOnly)->distinct()->pluck('occasion')->filter()->sort();
-        $materials = (clone $publishedOnly)->distinct()->pluck('materials')->filter()->sort(); 
-        $years = (clone $publishedOnly)->distinct()->pluck('year_made')->filter()->sortDesc();
+        $colors = Product::distinct()->pluck('color')->filter()->sort();
+        $occasions = Product::distinct()->pluck('occasion')->filter()->sort();
+        $materials = Product::distinct()->pluck('materials')->filter()->sort(); 
+        $years = Product::distinct()->pluck('year_made')->filter()->sortDesc();
 
-        $products = $query->paginate(12);
+        $products = $query->paginate(5);
 
         return view('frontend.user.catalog', compact('products', 'colors', 'occasions', 'materials', 'years'));
     }

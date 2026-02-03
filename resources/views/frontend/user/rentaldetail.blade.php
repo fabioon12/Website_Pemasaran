@@ -72,7 +72,6 @@
         margin-bottom: 40px;
     }
 
-    /* --- Measurement Styling --- */
     .measurement-grid {
         background: #fff;
         border: 1px dashed #ccc;
@@ -116,47 +115,15 @@
         margin-top: 15px;
         border-radius: 4px;
     }
-      .navbar {
-        height: var(--nav-height);
-        background: rgba(255, 255, 255, 0.8) !important; /* Transparan sedikit */
-        backdrop-filter: blur(15px); /* Efek blur kaca modern */
-        -webkit-backdrop-filter: blur(15px);
-        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-        transition: all 0.3s ease;
-    }
-
-    .navbar-brand {
-        font-size: 1.1rem;
-        letter-spacing: 1px;
-        color: var(--archive-black) !important;
-    }
-
-    .nav-profile-img {
-        width: 38px;
-        height: 38px;
-        object-fit: cover;
-        border-radius: 50%;
-        border: 2px solid #fff;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-
-    .dropdown-menu {
-        border: none !important;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.08) !important;
-        border-radius: 12px !important;
-        margin-top: 15px !important;
-    }
 </style>
 
 <div class="container detail-container mt-5 pb-5">
-    {{-- Breadcrumb --}}
     <a href="{{ route('customer.rental.index') }}" class="text-decoration-none text-dark small fw-bold text-uppercase mb-4 d-inline-block">
         <i class="bi bi-arrow-left"></i> Back to My Archives
     </a>
 
     <div class="row">
         <div class="col-lg-8">
-            {{-- Status Banner --}}
             <div class="status-banner status-{{ $booking->status }}">
                 Order Status: {{ $booking->status }}
             </div>
@@ -164,7 +131,7 @@
             <div class="row mb-4">
                 <div class="col-md-6">
                     <h2 class="fw-800 text-uppercase mb-1">Archive Receipt</h2>
-                    <p class="text-muted small">ID: #ARC-{{ str_pad($booking->id, 5, '0', STR_PAD_LEFT) }}</p>
+                    <p class="text-muted small fw-bold">REF ID: <span class="text-primary">#B-{{ str_pad($booking->id, 4, '0', STR_PAD_LEFT) }}</span></p>
                 </div>
                 <div class="col-md-6 text-md-end">
                     <p class="small text-muted mb-0 uppercase">Rental Period</p>
@@ -178,13 +145,27 @@
                 </div>
             </div>
 
-            {{-- Main Product Info --}}
+            <h3 class="section-title">Logistics & Event Details</h3>
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="info-group">
+                        <span class="info-label">Event Occasion</span>
+                        <span class="info-value">{{ $booking->occasion ?? 'No occasion specified' }}</span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="info-group">
+                        <span class="info-label">Venue Location</span>
+                        <span class="info-value">{{ $booking->venue ?? 'No venue specified' }}</span>
+                    </div>
+                </div>
+            </div>
+
             <h3 class="section-title">Item Summary</h3>
             <div class="product-box mb-4">
                 @php
                     $images = is_array($booking->product->images) ? $booking->product->images : json_decode($booking->product->images, true);
                     $img = (!empty($images)) ? asset('storage/' . $images[0]) : 'https://via.placeholder.com/120x160';
-                    // Simulasi status sebelum backend siap
                     $temp_payment_status = $booking->payment_status ?? 'unpaid';
                 @endphp
                 <img src="{{ $img }}" class="product-img shadow-sm" alt="">
@@ -195,7 +176,6 @@
                 </div>
             </div>
 
-            {{-- Technical Specifications --}}
             <h3 class="section-title">Technical Specifications</h3>
             <div class="tech-grid">
                 <div class="info-group mb-0">
@@ -208,28 +188,23 @@
                 </div>
             </div>
 
-            {{-- Measurement Details --}}
             <h3 class="section-title">Measurement Details (CM)</h3>
-            
             <div class="measurement-grid">
                 <div class="measure-item">
                     <div class="measure-icon"><i class="bi bi-arrows-expand"></i> BUST</div>
                     <span class="measure-val">{{ $booking->product->measure_bust ?? '--' }}</span>
                     <span class="info-label">Centimeters</span>
                 </div>
-                
                 <div class="measure-item">
                     <div class="measure-icon"><i class="bi bi-arrows-collapse"></i> WAIST</div>
                     <span class="measure-val">{{ $booking->product->measure_waist ?? '--' }}</span>
                     <span class="info-label">Centimeters</span>
                 </div>
-
                 <div class="measure-item">
                     <div class="measure-icon"><i class="bi bi-intersect"></i> HIP</div>
                     <span class="measure-val">{{ $booking->product->measure_hip ?? '--' }}</span>
                     <span class="info-label">Centimeters</span>
                 </div>
-
                 <div class="measure-item">
                     <div class="measure-icon"><i class="bi bi-arrow-down-up"></i> LENGTH</div>
                     <span class="measure-val">{{ $booking->product->measure_length ?? '--' }}</span>
@@ -237,7 +212,6 @@
                 </div>
             </div>
 
-            {{-- Financial Summary --}}
             <h3 class="section-title">Financial Summary</h3>
             <table class="w-100 price-table mb-5">
                 <tr>
@@ -255,7 +229,7 @@
             </table>
         </div>
 
-        {{-- Sidebar --}}
+        {{-- Sidebar Action Center --}}
         <div class="col-lg-4 ps-lg-5">
             <div class="p-4 bg-light shadow-sm">
                 <h3 class="section-title border-dark">Administrative Action</h3>
@@ -265,20 +239,16 @@
                     <div class="d-flex align-items-center gap-2 text-warning small fw-bold uppercase">
                         <i class="bi bi-clock-history"></i> Awaiting Verification
                     </div>
-
-                @elseif($booking->status == 'approved')
-                    
+                @elseif($booking->status == 'approved' || $booking->status == 'paid')
                     @if($temp_payment_status == 'unpaid')
                         <div class="mb-4">
                             <span class="badge bg-danger rounded-0 mb-2 uppercase" style="font-size: 0.6rem">Payment Required</span>
                             <p class="small text-muted mb-3">Your request has been approved. Please complete the transfer to confirm your rental.</p>
-                            
                             <div class="bank-box mb-3">
                                 <span class="info-label">Bank Central Asia (BCA)</span>
                                 <span class="fw-bold d-block">8830 2931 11</span>
                                 <span class="small text-muted">A/N ARCHIVE COLLECTION</span>
                             </div>
-
                             <button class="btn btn-dark w-100 rounded-0 py-2 small fw-bold text-uppercase" data-bs-toggle="modal" data-bs-target="#payModal">
                                 Upload Proof of Payment
                             </button>
@@ -287,21 +257,27 @@
                         <div class="text-center py-3">
                             <i class="bi bi-search fs-3 text-primary"></i>
                             <p class="small fw-bold mt-2 mb-0">PAYMENT VERIFYING</p>
-                            <p class="small text-muted">We are currently checking your transaction.</p>
-                        </div>
+                            <p class="small text-muted mb-3">We are currently checking your transaction.</p>
+                            
+                            <button class="btn btn-outline-dark w-100 rounded-0 py-2 small fw-bold text-uppercase" data-bs-toggle="modal" data-bs-target="#viewProofModal">
+                                <i class="bi bi-image me-1"></i> Lihat Bukti Pembayaran
+                            </button>
+                            
+                            <button class="btn btn-link btn-sm text-decoration-none text-muted mt-2 small" data-bs-toggle="modal" data-bs-target="#payModal">
+                                Re-upload proof
+                            </button>
+                        </div> 
                     @else
                         <div class="bg-dark text-white p-3 text-center mb-4">
                             <i class="bi bi-qr-code fs-1"></i>
                             <p class="small fw-bold mt-2 mb-0">PICKUP CODE</p>
-                            <h5 class="fw-800">ARC-{{ $booking->id }}</h5>
+                            <h5 class="fw-800">#B-{{ str_pad($booking->id, 4, '0', STR_PAD_LEFT) }}</h5>
                         </div>
-                        <p class="small text-muted">Show this code at the gallery to collect your item.</p>
+                        <p class="small text-muted text-center">Show this code at the gallery to collect your item.</p>
                     @endif
-
                 @endif
                 
                 <hr class="my-4">
-                
                 <h3 class="section-title">Care Instructions</h3>
                 <ul class="list-unstyled small text-muted">
                     <li class="mb-2"><i class="bi bi-shield-check me-2"></i> No home washing allowed</li>
@@ -313,7 +289,7 @@
     </div>
 </div>
 
-{{-- Static Pay Modal --}}
+{{-- Pay Modal --}}
 <div class="modal fade" id="payModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content rounded-0 border-0">
@@ -321,15 +297,42 @@
                 <h5 class="fw-bold text-uppercase small mb-0">Submit Payment Proof</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
-                <p class="text-muted small mb-3">Ensure the receipt shows the date, total amount, and destination account.</p>
-                <div class="mb-3">
-                    <label class="info-label mb-1">Receipt Image (JPG/PNG)</label>
-                    <input type="file" class="form-control rounded-0">
+            <form action="{{ route('customer.payment.submit', $booking->id) }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                <div class="modal-body">
+                    <p class="text-muted small mb-3">Ensure the receipt shows the date, total amount, and destination account.</p>
+                    <div class="mb-3">
+                        <label class="info-label mb-1">Receipt Image (JPG/PNG)</label>
+                        <input type="file" name="payment_proof" class="form-control rounded-0" required accept="image/*">
+                    </div>
+                    <button type="submit" class="btn btn-dark w-100 rounded-0 fw-bold py-2 text-uppercase small">
+                        Confirm Payment
+                    </button>
                 </div>
-                <button type="button" class="btn btn-dark w-100 rounded-0 fw-bold py-2 text-uppercase small" onclick="alert('Submit feature will be active once backend is connected.')">
-                    Confirm Payment
-                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+{{-- View Proof Modal --}}
+<div class="modal fade" id="viewProofModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-0 border-0">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="fw-bold text-uppercase small mb-0">Your Payment Proof</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                @if($booking->payment_proof)
+                    <img src="{{ asset('storage/' . $booking->payment_proof) }}" class="img-fluid border shadow-sm" alt="Payment Proof">
+                @else
+                    <p class="text-muted small">No proof uploaded.</p>
+                @endif
+                <div class="mt-3 text-start bg-light p-3 border-start border-primary border-3">
+                    <p class="small text-muted mb-0 italic">
+                        <i class="bi bi-info-circle me-1"></i> Bukti ini sedang dalam antrean verifikasi oleh tim kami. Mohon tunggu maksimal 1x24 jam.
+                    </p>
+                </div>
             </div>
         </div>
     </div>
