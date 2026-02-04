@@ -139,11 +139,11 @@
                         <div><span class="measure-val">{{ $product->measure_hip ?? '--' }}</span><span class="measure-unit">cm</span></div>
                     </div>
                     <div class="measure-card">
-                        <span class="measure-label">Length</span>
+                        <span class="measure-label">Skirt Lenght</span>
                         <div><span class="measure-val">{{ $product->measure_length ?? '--' }}</span><span class="measure-unit">cm</span></div>
                     </div>
                 </div>
-
+    
                 <div class="section-box">
                     <h3 class="section-title">Technical Details</h3>
                     <div class="info-row">

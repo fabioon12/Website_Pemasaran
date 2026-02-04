@@ -32,7 +32,7 @@
                             </div>
                         </li>
                         <li><a class="dropdown-item rounded-2 py-2 small" href="{{ route('customer.profil.index') }}"><i class="bi bi-person me-2"></i> Profile</a></li>
-                        <li><a class="dropdown-item rounded-2 py-2 small" href="#"><i class="bi bi-bag-heart me-2"></i> My Wardrobe</a></li>
+                        <li><a class="dropdown-item rounded-2 py-2 small" href="{{ route('customer.rental.index') }}"><i class="bi bi-bag-heart me-2"></i> My Wardrobe</a></li>
                         <li><hr class="dropdown-divider opacity-50"></li>
                         <li>
                             <form action="{{ route('logout') }}" method="POST">

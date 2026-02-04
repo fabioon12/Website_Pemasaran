@@ -52,7 +52,7 @@
         <div class="row align-items-end">
             <div class="col-md-6">
                 <span class="text-muted small fw-bold text-uppercase">Member Dashboard</span>
-                <h1 class="header-title">My Archive Requests</h1>
+                <h1 class="header-title">My Wardrobe Requests</h1>
             </div>
             <div class="col-md-6 text-md-end">
                 <p class="text-muted small">Showing {{ $bookings->total() }} total collections</p>
