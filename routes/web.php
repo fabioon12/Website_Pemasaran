@@ -6,6 +6,7 @@ use App\Http\Controllers\auth\registercontroller;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\ProdukController;
 use App\Http\Controllers\DashboardbokingController;
+use App\Http\Controllers\Customer\HomeController;
 use App\Http\Controllers\Customer\CatalogController;
 use App\Http\Controllers\Customer\BookingController;
 USE App\Http\Controllers\Customer\ProfilController;
@@ -14,13 +15,14 @@ use App\Http\Controllers\CustomerdashboardController;
 
 
 
-//Landing Page
-Route::get('/', function () {
-    return view('landingpage.welcome');
-});
-Route::get('/catalog', [CataloglandingController::class, 'index'])->name('catalog.index');
+
 // Authentication Routes
 Route::middleware(['redirectIfAuthenticated'])->group(function () {
+    Route::get('/', function () {
+        return view('landingpage.welcome');
+    })->name('welcome');
+
+    Route::get('/catalog', [CataloglandingController::class, 'index'])->name('catalog.index');
     Route::get('/login', [LoginController::class, 'index'])->name('login');
     Route::post('/login', [LoginController::class, 'store'])->name('login.store');
     Route::get('/register', [RegisterController::class, 'index'])->name('register');
@@ -49,6 +51,7 @@ Route::prefix('admin')->middleware(['auth', 'role:ADMINISTRATOR'])->group(functi
     Route::get('customer/dashboard', [CustomerdashboardController::class, 'index'])->name('admin.customer.dashboard');
 });
 Route::prefix('customer')->middleware(['auth', 'role:CUSTOMER'])->group(function () {
+    Route::get('home', [HomeController::class, 'index'])->name('customer.home.index');
     Route::get('catalog', [CatalogController::class, 'index'])->name('customer.catalog.index');
     Route::get('/booking/{id}', [BookingController::class, 'show'])->name('customer.booking.show');
     Route::post('/booking/{product}', [BookingController::class, 'store'])->name('customer.booking.store');

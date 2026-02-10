@@ -13,7 +13,7 @@
             </ol>
         </nav>
         <div class="d-flex align-items-center gap-3">
-            <a href="{{ route('admin.produk.index') }}" class="btn btn-white border rounded-circle p-2 shadow-sm">
+            <a href="{{ route('admin.produk.index') }}" class="btn btn-white border rounded-circle p-2 shadow-sm hover-up">
                 <i class="bi bi-arrow-left"></i>
             </a>
             <h2 class="fw-bold mb-0" style="letter-spacing: -1px;">Create New Item</h2>
@@ -48,7 +48,44 @@
                     </div>
                 </div>
 
-                {{-- Spesifikasi Produk (Sesuai Attr Grid) --}}
+                {{-- Media Gallery (3 Box Terpisah) --}}
+                <div class="card border-0 shadow-sm p-4 mb-4" style="border-radius: 24px;">
+                    <h5 class="fw-bold mb-1">Product Images</h5>
+                    <p class="text-muted small mb-4">Upload exactly 3 images: Main view, alternative angle, and material detail.</p>
+                    
+                    <div class="row g-3">
+                        @for ($i = 0; $i < 3; $i++)
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold small text-uppercase text-muted">
+                                {{ $i == 0 ? 'Main Photo' : 'Gallery Photo ' . $i }}
+                            </label>
+                            <div class="upload-box border-dashed rounded-4 position-relative d-flex flex-column align-items-center justify-content-center bg-light" style="height: 220px; transition: 0.3s; overflow: hidden;">
+                                
+                                {{-- Placeholder --}}
+                                <div class="text-center p-3" id="placeholder-{{ $i }}">
+                                    <i class="bi bi-plus-circle fs-3 text-muted"></i>
+                                    <p class="mb-0 small fw-bold text-muted mt-2">Add Image</p>
+                                </div>
+
+                                {{-- Image Preview --}}
+                                <img id="preview-{{ $i }}" class="img-fluid d-none w-100 h-100" style="object-fit: cover;">
+                                
+                                {{-- Hidden Input --}}
+                                <input type="file" name="images[]" class="position-absolute top-0 start-0 w-100 h-100 opacity-0" 
+                                       style="cursor: pointer;" onchange="previewImage(this, {{ $i }})" accept="image/*" {{ $i == 0 ? 'required' : '' }}>
+                                
+                                {{-- Remove Button --}}
+                                <button type="button" class="btn btn-dark btn-sm position-absolute top-0 end-0 m-2 d-none shadow-sm" 
+                                        id="remove-{{ $i }}" onclick="resetImage({{ $i }})" style="border-radius: 8px;">
+                                    <i class="bi bi-x-lg"></i>
+                                </button>
+                            </div>
+                        </div>
+                        @endfor
+                    </div>
+                </div>
+
+                {{-- Spesifikasi Produk --}}
                 <div class="card border-0 shadow-sm p-4 mb-4" style="border-radius: 24px;">
                     <h5 class="fw-bold mb-4">Product Specifications</h5>
                     <div class="row g-3">
@@ -60,54 +97,34 @@
                             <label class="form-label fw-bold small text-uppercase text-muted">Color</label>
                             <input type="text" name="color" class="form-control border-0 bg-light p-3 rounded-3" placeholder="Black" value="{{ old('color') }}">
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-12">
                             <label class="form-label fw-bold small text-uppercase text-muted">Occasion</label>
                             <input type="text" name="occasion" class="form-control border-0 bg-light p-3 rounded-3" placeholder="Evening / Gala" value="{{ old('occasion') }}">
                         </div>
-                        <!-- <div class="col-md-6">
-                            <label class="form-label fw-bold small text-uppercase text-muted">Size Label</label>
-                            <select name="size_label" class="form-select border-0 bg-light p-3 rounded-3">
-                                <option value="S">S</option>
-                                <option value="M" selected>M</option>
-                                <option value="L">L</option>
-                                <option value="XL">XL</option>
-                            </select>
-                        </div> -->
                     </div>
                 </div>
 
-                {{-- Detail Pengukuran (Section Box) --}}
+                {{-- Measurement Details --}}
                 <div class="card border-0 shadow-sm p-4 mb-4" style="border-radius: 24px;">
                     <h5 class="fw-bold mb-4">Measurement Details (Inches)</h5>
                     <div class="row g-3">
                         <div class="col-md-3">
                             <label class="form-label fw-bold small text-muted">Bust</label>
-                            <input type="text" name="measure_bust" class="form-control border-0 bg-light p-3 rounded-3" placeholder="36\"">
+                            <input type="text" name="measure_bust" class="form-control border-0 bg-light p-3 rounded-3" placeholder='36"'>
                         </div>
                         <div class="col-md-3">
                             <label class="form-label fw-bold small text-muted">Waist</label>
-                            <input type="text" name="measure_waist" class="form-control border-0 bg-light p-3 rounded-3" placeholder="28\"">
+                            <input type="text" name="measure_waist" class="form-control border-0 bg-light p-3 rounded-3" placeholder='28"'>
                         </div>
                         <div class="col-md-3">
                             <label class="form-label fw-bold small text-muted">Hip</label>
-                            <input type="text" name="measure_hip" class="form-control border-0 bg-light p-3 rounded-3" placeholder="38\"">
+                            <input type="text" name="measure_hip" class="form-control border-0 bg-light p-3 rounded-3" placeholder='38"'>
                         </div>
                         <div class="col-md-3">
                             <label class="form-label fw-bold small text-muted">Length</label>
-                            <input type="text" name="measure_length" class="form-control border-0 bg-light p-3 rounded-3" placeholder="58\"">
+                            <input type="text" name="measure_length" class="form-control border-0 bg-light p-3 rounded-3" placeholder='58"'>
                         </div>
                     </div>
-                </div>
-
-                {{-- Media Gallery --}}
-                <div class="card border-0 shadow-sm p-4" style="border-radius: 24px;">
-                    <h5 class="fw-bold mb-3">Media Gallery</h5>
-                    <div class="upload-zone border-dashed rounded-4 p-5 text-center position-relative" id="dropzone">
-                        <i class="bi bi-images fs-1 text-muted"></i>
-                        <h6 class="mt-3 fw-bold">Click to upload or drag and drop</h6>
-                        <input type="file" name="images[]" id="imageInput" multiple accept="image/*" class="position-absolute top-0 start-0 w-100 h-100 opacity-0" style="cursor: pointer;">
-                    </div>
-                    <div id="imagePreviewContainer" class="d-flex flex-wrap gap-3 mt-4"></div>
                 </div>
             </div>
 
@@ -138,12 +155,9 @@
                         <label class="form-label fw-bold small text-uppercase text-muted">Status</label>
                         <div class="form-check form-switch p-3 bg-light rounded-3 border-0 d-flex align-items-center justify-content-between">
                             <label class="form-check-label fw-bold small" for="is_published">Publish to Catalog</label>
-                            
                             <input type="hidden" name="is_published" value="0">
-                            
-                            <input class="form-check-input ms-0" type="checkbox" name="is_published" id="is_published" value="1" {{ old('is_published', '1') == '1' ? 'checked' : '' }}>
+                            <input class="form-check-input ms-0" type="checkbox" name="is_published" id="is_published" value="1" checked>
                         </div>
-                        <small class="text-muted" style="font-size: 0.65rem;">If turned off, this item will be saved as a draft.</small>
                     </div>
                 </div>
 
@@ -151,7 +165,7 @@
                     <button type="submit" class="btn btn-dark p-3 rounded-pill fw-bold shadow hover-up">
                         <i class="bi bi-cloud-arrow-up me-2"></i>Save Product
                     </button>
-                    <a href="{{ route('admin.produk.index') }}" class="btn btn-white border p-3 rounded-pill fw-bold">Discard</a>
+                    <a href="{{ route('admin.produk.index') }}" class="btn btn-white border p-3 rounded-pill fw-bold">Discard Changes</a>
                 </div>
             </div>
         </div>
@@ -159,30 +173,42 @@
 </div>
 
 <style>
-    .upload-zone { border: 2px dashed #dee2e6; background: #f8f9fa; transition: 0.3s; }
-    .upload-zone:hover { border-color: #000 !important; background: #fff !important; }
-    .preview-img { width: 80px; height: 100px; object-fit: cover; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+    .upload-box { border: 2px dashed #dee2e6; cursor: pointer; }
+    .upload-box:hover { border-color: #000; background-color: #f1f1f1 !important; }
     .hover-up { transition: 0.3s; }
     .hover-up:hover { transform: translateY(-3px); }
 </style>
 
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    const imageInput = document.getElementById('imageInput');
-    const previewContainer = document.getElementById('imagePreviewContainer');
+    function previewImage(input, index) {
+        const preview = document.getElementById(`preview-${index}`);
+        const placeholder = document.getElementById(`placeholder-${index}`);
+        const removeBtn = document.getElementById(`remove-${index}`);
 
-    imageInput.addEventListener('change', function() {
-        previewContainer.innerHTML = '';
-        [...this.files].forEach(file => {
+        if (input.files && input.files[0]) {
             const reader = new FileReader();
-            reader.onload = (e) => {
-                const img = document.createElement('img');
-                img.src = e.target.result;
-                img.classList.add('preview-img');
-                previewContainer.appendChild(img);
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                preview.classList.remove('d-none');
+                placeholder.classList.add('d-none');
+                removeBtn.classList.remove('d-none');
             }
-            reader.readAsDataURL(file);
-        });
-    });
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    function resetImage(index) {
+        // Karena input images[] adalah array, kita ambil berdasarkan index
+        const inputs = document.getElementsByName('images[]');
+        const preview = document.getElementById(`preview-${index}`);
+        const placeholder = document.getElementById(`placeholder-${index}`);
+        const removeBtn = document.getElementById(`remove-${index}`);
+
+        inputs[index].value = ''; // Reset file input
+        preview.src = '';
+        preview.classList.add('d-none');
+        placeholder.classList.remove('d-none');
+        removeBtn.classList.add('d-none');
+    }
 </script>
 @endsection

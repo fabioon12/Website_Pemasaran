@@ -44,23 +44,24 @@ class ProdukController extends Controller
 
     public function store(Request $request)
     {
-    
         $request->validate([
             'name'           => 'required|string|max:255',
             'author'         => 'nullable|string|max:255',
             'price'          => 'required|numeric',
             'stock'          => 'required|integer',
-            'images.*'       => 'image|mimes:jpeg,png,jpg|max:2048',
+            'images'         => 'required|array|min:1|max:3', // Pastikan images adalah array
+            'images.*'       => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'year_made'      => 'nullable|integer',
             'is_published'   => 'nullable',
         ]);
 
-
-     
         $images = [];
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $image) {
-                $images[] = $image->store('products', 'public');
+            
+                if ($image) {
+                    $images[] = $image->store('products', 'public');
+                }
             }
         }
 
@@ -79,7 +80,7 @@ class ProdukController extends Controller
             'materials'       => $request->materials,
             'stock'           => $request->stock,
             'is_published'    => $request->boolean('is_published'), 
-            'images'          => $images, 
+            'images'          => $images,
         ]);
 
         return redirect()->route('admin.produk.index')->with('success', 'Produk berhasil ditambahkan!');
@@ -96,28 +97,39 @@ class ProdukController extends Controller
         $product = Product::findOrFail($id);
         
         $request->validate([
-            'name'   => 'required|string|max:255',
-            'price'  => 'required|numeric',
-            'stock'  => 'required|integer',
+            'name'     => 'required|string|max:255',
+            'price'    => 'required|numeric',
+            'stock'    => 'required|integer',
+            'images.*' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-
-        $data = $request->all();
+  
+        $data = $request->except('images'); 
         $data['is_published'] = $request->boolean('is_published');
 
 
+        $currentImages = is_string($product->images) ? json_decode($product->images, true) : ($product->images ?? []);
+
+  
         if ($request->hasFile('images')) {
-            if ($product->images) {
-                foreach ($product->images as $oldImage) {
-                    Storage::disk('public')->delete($oldImage);
+            foreach ($request->file('images') as $index => $newFile) {
+                if ($newFile) {
+       
+                    if (isset($currentImages[$index]) && Storage::disk('public')->exists($currentImages[$index])) {
+                        Storage::disk('public')->delete($currentImages[$index]);
+                    }
+
+         
+                    $path = $newFile->store('products', 'public');
+
+            
+                    $currentImages[$index] = $path;
                 }
             }
-
-            $images = [];
-            foreach ($request->file('images') as $image) {
-                $images[] = $image->store('products', 'public');
-            }
-            $data['images'] = $images;
+            
+            // Urutkan array berdasarkan kunci agar tetap rapi (0, 1, 2)
+            ksort($currentImages);
+            $data['images'] = array_values($currentImages);
         }
 
         $product->update($data);

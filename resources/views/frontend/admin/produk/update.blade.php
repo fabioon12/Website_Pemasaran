@@ -14,12 +14,12 @@
         </nav>
         <div class="d-flex align-items-center justify-content-between">
             <div class="d-flex align-items-center gap-3">
-                <a href="{{ route('admin.produk.index') }}" class="btn btn-white border rounded-circle p-2 shadow-sm">
+                <a href="{{ route('admin.produk.index') }}" class="btn btn-white border rounded-circle p-2 shadow-sm hover-up">
                     <i class="bi bi-arrow-left"></i>
                 </a>
                 <div>
                     <h2 class="fw-bold mb-0" style="letter-spacing: -1px;">Edit Item</h2>
-                    <span class="text-muted small" >#{{ str_pad($product->id, 4, '0', STR_PAD_LEFT) }}</span>
+                    <span class="text-muted small">#{{ str_pad($product->id, 4, '0', STR_PAD_LEFT) }}</span>
                 </div>
             </div>
             @if($product->is_published)
@@ -34,7 +34,7 @@
         </div>
     </div>
 
-    <form action="{{ route('admin.produk.update', $product->id) }}" method="POST" enctype="multipart/form-data" id="editProductForm">
+    <form action="{{ route('admin.produk.update', $product->id) }}" method="POST" enctype="multipart/form-data" id="productForm">
         @csrf
         @method('PUT')
         
@@ -64,6 +64,49 @@
                     </div>
                 </div>
 
+                {{-- Media Gallery (3 Box Terpisah - Mengikuti Desain Create) --}}
+                <div class="card border-0 shadow-sm p-4 mb-4" style="border-radius: 24px;">
+                    <h5 class="fw-bold mb-1">Product Images</h5>
+                    <p class="text-muted small mb-4">You can replace existing images by clicking on the boxes below.</p>
+                    
+                    <div class="row g-3">
+                        @for ($i = 0; $i < 3; $i++)
+                        @php
+                            $existingImage = isset($product->images[$i]) ? $product->images[$i] : null;
+                        @endphp
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold small text-uppercase text-muted">
+                                {{ $i == 0 ? 'Main Photo' : 'Gallery Photo ' . $i }}
+                            </label>
+                            <div class="upload-box border-dashed rounded-4 position-relative d-flex flex-column align-items-center justify-content-center bg-light" style="height: 220px; transition: 0.3s; overflow: hidden;">
+                                
+                                {{-- Placeholder (Tampil jika tidak ada gambar) --}}
+                                <div class="text-center p-3 {{ $existingImage ? 'd-none' : '' }}" id="placeholder-{{ $i }}">
+                                    <i class="bi bi-plus-circle fs-3 text-muted"></i>
+                                    <p class="mb-0 small fw-bold text-muted mt-2">Add Image</p>
+                                </div>
+
+                                {{-- Image Preview (Tampil jika ada gambar existing atau baru) --}}
+                                <img id="preview-{{ $i }}" 
+                                     src="{{ $existingImage ? asset('storage/' . $existingImage) : '' }}" 
+                                     class="img-fluid {{ $existingImage ? '' : 'd-none' }} w-100 h-100" 
+                                     style="object-fit: cover;">
+                                
+                                {{-- Hidden Input --}}
+                                <input type="file" name="images[{{ $i }}]" class="position-absolute top-0 start-0 w-100 h-100 opacity-0" 
+                                       style="cursor: pointer;" onchange="previewImage(this, {{ $i }})" accept="image/*">
+                                
+                                {{-- Remove Button --}}
+                                <button type="button" class="btn btn-dark btn-sm position-absolute top-0 end-0 m-2 {{ $existingImage ? '' : 'd-none' }} shadow-sm" 
+                                        id="remove-{{ $i }}" onclick="resetImage({{ $i }})" style="border-radius: 8px;">
+                                    <i class="bi bi-x-lg"></i>
+                                </button>
+                            </div>
+                        </div>
+                        @endfor
+                    </div>
+                </div>
+
                 {{-- Spesifikasi Produk --}}
                 <div class="card border-0 shadow-sm p-4 mb-4" style="border-radius: 24px;">
                     <h5 class="fw-bold mb-4">Product Specifications</h5>
@@ -78,23 +121,15 @@
                             <input type="text" name="color" class="form-control border-0 bg-light p-3 rounded-3" 
                                    value="{{ old('color', $product->color) }}">
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-12">
                             <label class="form-label fw-bold small text-uppercase text-muted">Occasion</label>
                             <input type="text" name="occasion" class="form-control border-0 bg-light p-3 rounded-3" 
                                    value="{{ old('occasion', $product->occasion) }}">
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-bold small text-uppercase text-muted">Size Label</label>
-                            <select name="size_label" class="form-select border-0 bg-light p-3 rounded-3">
-                                @foreach(['S', 'M', 'L', 'XL'] as $size)
-                                    <option value="{{ $size }}" {{ old('size_label', $product->size_label) == $size ? 'selected' : '' }}>{{ $size }}</option>
-                                @endforeach
-                            </select>
-                        </div>
                     </div>
                 </div>
 
-                {{-- Detail Pengukuran --}}
+                {{-- Measurement Details --}}
                 <div class="card border-0 shadow-sm p-4 mb-4" style="border-radius: 24px;">
                     <h5 class="fw-bold mb-4">Measurement Details (Inches)</h5>
                     <div class="row g-3">
@@ -119,35 +154,6 @@
                                    value="{{ old('measure_length', $product->measure_length) }}">
                         </div>
                     </div>
-                </div>
-
-                {{-- Media Gallery --}}
-                <div class="card border-0 shadow-sm p-4" style="border-radius: 24px;">
-                    <h5 class="fw-bold mb-3">Media Gallery</h5>
-                    
-                    {{-- Foto Saat Ini --}}
-                    <div class="mb-4">
-                        <label class="small text-muted d-block mb-3 text-uppercase fw-bold">Current Photos</label>
-                        <div class="d-flex flex-wrap gap-3">
-                            @if($product->images && count($product->images) > 0)
-                                @foreach($product->images as $img)
-                                    <div class="position-relative">
-                                        <img src="{{ asset('storage/' . $img) }}" class="preview-img shadow-sm" alt="Product">
-                                    </div>
-                                @endforeach
-                            @else
-                                <p class="text-muted small italic">No images uploaded.</p>
-                            @endif
-                        </div>
-                    </div>
-
-                    <div class="upload-zone border-dashed rounded-4 p-5 text-center position-relative" id="dropzone">
-                        <i class="bi bi-images fs-1 text-muted"></i>
-                        <h6 class="mt-3 fw-bold">Click to upload new images</h6>
-                        <p class="small text-muted">This will replace current images</p>
-                        <input type="file" name="images[]" id="imageInput" multiple accept="image/*" class="position-absolute top-0 start-0 w-100 h-100 opacity-0" style="cursor: pointer;">
-                    </div>
-                    <div id="imagePreviewContainer" class="d-flex flex-wrap gap-3 mt-4"></div>
                 </div>
             </div>
 
@@ -181,6 +187,7 @@
                         <label class="form-label fw-bold small text-uppercase text-muted">Status</label>
                         <div class="form-check form-switch p-3 bg-light rounded-3 border-0 d-flex align-items-center justify-content-between">
                             <label class="form-check-label fw-bold small" for="is_published">Publish to Catalog</label>
+                            <input type="hidden" name="is_published" value="0">
                             <input class="form-check-input ms-0" type="checkbox" name="is_published" id="is_published" value="1" 
                                    {{ old('is_published', $product->is_published) ? 'checked' : '' }}>
                         </div>
@@ -191,7 +198,7 @@
                     <button type="submit" class="btn btn-dark p-3 rounded-pill fw-bold shadow hover-up">
                         <i class="bi bi-cloud-arrow-up me-2"></i>Update Product
                     </button>
-                    <a href="{{ route('admin.produk.index') }}" class="btn btn-white border p-3 rounded-pill fw-bold">Discard</a>
+                    <a href="{{ route('admin.produk.index') }}" class="btn btn-white border p-3 rounded-pill fw-bold">Discard Changes</a>
                     
                     <hr class="my-3 opacity-50">
                     <button type="button" class="btn btn-outline-danger p-3 rounded-pill fw-bold border-0" onclick="confirmDelete()">
@@ -210,38 +217,46 @@
 </div>
 
 <style>
-    .upload-zone { border: 2px dashed #dee2e6; background: #f8f9fa; transition: 0.3s; }
-    .upload-zone:hover { border-color: #000 !important; background: #fff !important; }
-    .preview-img { width: 80px; height: 100px; object-fit: cover; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+    .upload-box { border: 2px dashed #dee2e6; cursor: pointer; }
+    .upload-box:hover { border-color: #000; background-color: #f1f1f1 !important; }
     .hover-up { transition: 0.3s; }
     .hover-up:hover { transform: translateY(-3px); }
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    // Live Preview untuk gambar baru
-    const imageInput = document.getElementById('imageInput');
-    const previewContainer = document.getElementById('imagePreviewContainer');
+    function previewImage(input, index) {
+        const preview = document.getElementById(`preview-${index}`);
+        const placeholder = document.getElementById(`placeholder-${index}`);
+        const removeBtn = document.getElementById(`remove-${index}`);
 
-    imageInput.addEventListener('change', function() {
-        previewContainer.innerHTML = '';
-        [...this.files].forEach(file => {
+        if (input.files && input.files[0]) {
             const reader = new FileReader();
-            reader.onload = (e) => {
-                const div = document.createElement('div');
-                div.innerHTML = `
-                    <div class="position-relative">
-                        <img src="${e.target.result}" class="preview-img animate__animated animate__zoomIn">
-                        <span class="badge bg-dark position-absolute top-0 start-50 translate-middle-x mt-1 small" style="font-size:10px">NEW</span>
-                    </div>
-                `;
-                previewContainer.appendChild(div);
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                preview.classList.remove('d-none');
+                placeholder.classList.add('d-none');
+                removeBtn.classList.remove('d-none');
             }
-            reader.readAsDataURL(file);
-        });
-    });
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
 
-    // Konfirmasi Hapus
+    function resetImage(index) {
+        // Karena input images[] adalah array, kita ambil berdasarkan index
+        const inputs = document.querySelectorAll('input[name="images['+index+']"]');
+        const preview = document.getElementById(`preview-${index}`);
+        const placeholder = document.getElementById(`placeholder-${index}`);
+        const removeBtn = document.getElementById(`remove-${index}`);
+
+        if(inputs.length > 0) inputs[0].value = ''; 
+        
+        preview.src = '';
+        preview.classList.add('d-none');
+        placeholder.classList.remove('d-none');
+        removeBtn.classList.add('d-none');
+    }
+
     function confirmDelete() {
         Swal.fire({
             title: 'Are you sure?',

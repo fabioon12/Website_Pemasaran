@@ -47,7 +47,7 @@
     .btn-wa:hover { background-color: #128C7E; color: white; }
 </style>
 
-<div class="container mt-5 pb-5">
+<div class="container pb-5">
     <div class="page-header">
         <div class="row align-items-end">
             <div class="col-md-6">
