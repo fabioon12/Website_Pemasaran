@@ -127,7 +127,7 @@ class ProdukController extends Controller
                 }
             }
             
-            // Urutkan array berdasarkan kunci agar tetap rapi (0, 1, 2)
+     
             ksort($currentImages);
             $data['images'] = array_values($currentImages);
         }

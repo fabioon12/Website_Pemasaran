@@ -42,7 +42,7 @@ class DashboardbokingController extends Controller
         $bookings = $query->latest()->paginate(5)->withQueryString();
         
        
-        $totalBookings = Booking::count();
+        $totalBookings = Booking::where('status', '!=', 'rejected')->count();
         $totalRevenue = Booking::where('payment_status', 'paid')->sum('total_price');
         $pendingCount = Booking::where('status', 'pending')->count();
 
@@ -65,23 +65,33 @@ class DashboardbokingController extends Controller
         }
 
         DB::transaction(function () use ($booking, $status, $oldStatus) {
-         
-            if ($status == 'paid') {
-                $booking->update([
-                    'payment_status' => 'paid'
-                ]);
             
+           
+            if ($status == 'paid') {
+                $booking->update(['payment_status' => 'paid']);
+                
                 if($booking->status == 'pending') {
                     $booking->update(['status' => 'approved']);
+                    $booking->product->increment('wear_count'); 
                 }
-            } else {
-                // Logika Increment/Decrement yang sudah Anda buat
+            } 
+            elseif ($status == 'rejected') {
+                $booking->update(['payment_status' => 'rejected']);
+                
+                if ($oldStatus == 'pending') {
+                    $booking->product->increment('stock', 1);
+                }
+                
+
+                $booking->update(['status' => 'rejected']);
+            } 
+            
+
+            else {
                 if ($status == 'approved' && $oldStatus == 'pending') {
                     $booking->product->increment('wear_count');
                 }
-                if ($status == 'rejected' && $oldStatus == 'pending') {
-                    $booking->product->increment('stock', 1);
-                }
+                
                 if ($status == 'returned' && $oldStatus == 'approved') {
                     $booking->product->increment('stock', 1);
                 }

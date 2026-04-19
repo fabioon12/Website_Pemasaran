@@ -78,6 +78,8 @@
                 
                 <a href="{{ route('customer.catalog.index') }}" 
                    class="nav-link-custom {{ Route::is('customer.catalog.*') ? 'active' : '' }}">CATALOG</a>
+                <a href="{{ route('customer.materi.index') }}" 
+                   class="nav-link-custom {{ Route::is('customer.materi.*') ? 'active' : '' }}">RUANG BELAJAR</a>
             </div>
         </div>
         
@@ -107,6 +109,7 @@
                     <ul class="dropdown-menu dropdown-menu-end border-0 p-2 mt-2" aria-labelledby="userMenu">
                         <li class="d-md-none"><a class="dropdown-item rounded-2 py-2 small" href="{{ route('customer.home.index') }}">Home</a></li>
                         <li class="d-md-none"><a class="dropdown-item rounded-2 py-2 small" href="{{ route('customer.catalog.index') }}">Catalog</a></li>
+                        
                         <li class="d-md-none"><hr class="dropdown-divider opacity-50"></li>
                         
                         <li><a class="dropdown-item rounded-2 py-2 small" href="{{ route('customer.profil.index') }}"><i class="bi bi-person me-2"></i> Profile</a></li>

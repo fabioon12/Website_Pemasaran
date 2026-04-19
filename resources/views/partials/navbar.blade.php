@@ -22,6 +22,7 @@
                         Catalogue
                     </a>
                 </li>
+               
                 <li class="nav-item mt-2 mt-lg-0">
                     <a class="btn btn-dark px-4 rounded-pill btn-login" href="{{ url('/login') }}">
                         Login

@@ -133,11 +133,15 @@
             class="nav-link {{ request()->routeIs('admin.produk.*') ? 'active' : '' }}">
                 <i class="bi bi-box-seam"></i> Products
             </a>
+            
 
             <a href="{{ route('admin.booking.index') }}" class="nav-link {{ request()->routeIs('admin.booking.*') ? 'active' : '' }}">
                 <i class="bi bi-calendar-event"></i> Bookings
             </a>
-
+            <a href="{{ route('admin.ruang-materi.index') }}" 
+            class="nav-link {{ request()->routeIs('admin.ruang-materi.*') ? 'active' : '' }}">
+                <i class="bi bi-book"></i> Ruang Materi
+            </a>
             <!-- <a href="{{ route('admin.customer.dashboard') }}" class="nav-link {{ request()->routeIs('admin.customer.dashboard') ? 'active' : '' }}">
                 <i class="bi bi-people"></i> Customers
             </a> -->

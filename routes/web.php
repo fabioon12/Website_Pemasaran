@@ -12,7 +12,9 @@ use App\Http\Controllers\Customer\BookingController;
 USE App\Http\Controllers\Customer\ProfilController;
 use App\Http\Controllers\landingpage\CataloglandingController;
 use App\Http\Controllers\CustomerdashboardController;
-
+use App\Http\Controllers\Admin\MateriController as MateriAdminController;
+use App\Http\Controllers\Admin\SubmateriController as SubmateriAdminController;
+use App\Http\Controllers\Customer\MatapelajaranController;
 
 
 
@@ -49,6 +51,26 @@ Route::prefix('admin')->middleware(['auth', 'role:ADMINISTRATOR'])->group(functi
     Route::get('/admin/bookings/{id}/detail', [DashboardbokingController::class, 'DetailBooking'])->name('admin.bookings.detail');
     // customer dashboard
     Route::get('customer/dashboard', [CustomerdashboardController::class, 'index'])->name('admin.customer.dashboard');
+    // ruang materi
+    Route::get('/ruang-materi', [MateriAdminController::class, 'index'])->name('admin.ruang-materi.index');
+    Route::get('/ruang-materi/create', [MateriAdminController::class, 'create'])->name('admin.ruang-materi.create');
+    Route::post('/ruang-materi', [MateriAdminController::class, 'store'])->name('admin.ruang-materi.store');
+    Route::get('/ruang-materi/{id}/edit', [MateriAdminController::class, 'edit'])->name('admin.ruang-materi.edit');
+    Route::put('/ruang-materi/{id}', [MateriAdminController::class, 'update'])->name('admin.ruang-materi.update');
+    Route::delete('/ruang-materi/{id}', [MateriAdminController::class, 'destroy'])->name('admin.ruang-materi.destroy');
+    // submateri
+    Route::get('/ruang-materi/{materi_id}/sub-materi', [SubMateriAdminController::class, 'index'])
+        ->name('admin.submateri.index');
+    Route::get('/ruang-materi/{materi_id}/sub-materi/create', [SubMateriAdminController::class, 'create'])
+        ->name('admin.submateri.create');
+    Route::post('/ruang-materi/{materi_id}/sub-materi', [SubMateriAdminController::class, 'store'])
+        ->name('admin.submateri.store');
+    Route::get('/ruang-materi/{materi_id}/sub-materi/{id}/edit', [SubMateriAdminController::class, 'edit'])
+        ->name('admin.submateri.edit');
+    Route::put('/ruang-materi/{materi_id}/sub-materi/{id}', [SubMateriAdminController::class, 'update'])
+        ->name('admin.submateri.update');
+    Route::delete('/ruang-materi/{materi_id}/sub-materi/{id}', [SubMateriAdminController::class, 'destroy'])
+        ->name('admin.submateri.destroy');
 });
 Route::prefix('customer')->middleware(['auth', 'role:CUSTOMER'])->group(function () {
     Route::get('home', [HomeController::class, 'index'])->name('customer.home.index');
@@ -62,7 +84,14 @@ Route::prefix('customer')->middleware(['auth', 'role:CUSTOMER'])->group(function
     Route::get('/profil', [ProfilController::class, 'index'])->name('customer.profil.index');
     Route::get('/profil/edit', [ProfilController::class, 'edit'])->name('customer.profil.edit');
     Route::put('/profil/update', [ProfilController::class, 'update'])->name('customer.profil.update');
+    // ruang belajar
+    Route::get('/ruang-belajar', [MatapelajaranController::class, 'index'])->name('customer.materi.index');
+    Route::get('/ruang-belajar/{id}', [MatapelajaranController::class, 'show'])->name('customer.materi.show');
+    Route::get('/ruang-belajar/{materi_id}/bab/{id}', [MatapelajaranController::class, 'belajar'])->name('customer.materi.belajar');
 });
 
 
 
+route::get('/Matapelajaran', function () {
+    return view('frontend.user.pembelajaran.matapelajaran');
+});

@@ -30,7 +30,7 @@ class UserSeeder extends Seeder
         $administrator->assignRole(RoleEnum::ADMINISTRATOR);
 
         $customer = User::firstOrCreate([
-            'email' => 'stu@gmail.com',
+            'email' => 'student@gmail.com',
         ],[
             'name' => 'Customer',
             'email' => 'student@gmail.com',

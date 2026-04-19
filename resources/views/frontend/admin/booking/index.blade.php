@@ -250,6 +250,10 @@
                                 <div class="pay-badge pay-paid-new">
                                     <i class="bi bi-check-circle-fill"></i> PAID
                                 </div>
+                            @elseif($item->payment_status == 'rejected')
+                                <div class="pay-badge pay-rejected">
+                                    <i class="bi bi-x-circle-fill"></i> REJECTED
+                                </div>
                             @elseif($item->status == 'pending')
                                 <div class="pay-badge pay-waiting">
                                     <i class="bi bi-clock-history"></i> WAITING
@@ -289,12 +293,24 @@
                                     </button>
                                     <ul class="dropdown-menu dropdown-menu-end shadow-lg">
                                         <li><a class="dropdown-item" href="{{ route('admin.bookings.detail', $item->id) }}"><i class="bi bi-eye"></i> View Details</a></li>
+                                        {{-- Tombol Confirm Return (Sudah ada) --}}
                                         @if($item->status == 'approved' && $item->payment_status == 'paid')
                                         <li>
                                             <form action="{{ route('admin.bookings.update-status', [$item->id, 'returned']) }}" method="POST" class="m-0">
                                                 @csrf @method('PATCH')
                                                 <button type="submit" class="dropdown-item text-primary">
                                                     <i class="bi bi-box-seam"></i> Confirm Return
+                                                </button>
+                                            </form>
+                                        </li>
+                                        @endif
+
+                                        @if($item->status == 'pending')
+                                        <li>
+                                            <form action="{{ route('admin.bookings.update-status', [$item->id, 'rejected']) }}" method="POST" class="m-0" onsubmit="return confirm('Are you sure you want to reject this booking?')">
+                                                @csrf @method('PATCH')
+                                                <button type="submit" class="dropdown-item text-danger">
+                                                    <i class="bi bi-x-circle"></i> Reject Booking
                                                 </button>
                                             </form>
                                         </li>
@@ -322,10 +338,25 @@
                                     </div>
                                 </div>
                                 <div class="modal-footer border-0">
-                                    <form action="{{ route('admin.bookings.update-status', [$item->id, 'paid']) }}" method="POST" class="w-100">
-                                        @csrf @method('PATCH')
-                                        <button type="submit" class="btn btn-success w-100 fw-bold rounded-3 py-2">ACCEPT PAYMENT</button>
-                                    </form>
+                                    <div class="row w-100 g-2"> 
+                                        <div class="col-6">
+                                            <form action="{{ route('admin.bookings.update-status', [$item->id, 'rejected']) }}" method="POST">
+                                                @csrf @method('PATCH')
+                                                <button type="submit" class="btn btn-outline-danger w-100 fw-bold rounded-3 py-2" onclick="return confirm('Reject this payment?')">
+                                                    REJECT PAYMENT
+                                                </button>
+                                            </form>
+                                        </div>
+
+                                        <div class="col-6">
+                                            <form action="{{ route('admin.bookings.update-status', [$item->id, 'paid']) }}" method="POST">
+                                                @csrf @method('PATCH')
+                                                <button type="submit" class="btn btn-success w-100 fw-bold rounded-3 py-2">
+                                                    ACCEPT PAYMENT
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>

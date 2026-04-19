@@ -53,4 +53,28 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+    public function subMaterisSelesai()
+    {
+        return $this->belongsToMany(SubMateri::class, 'sub_materi_user')
+                    ->withTimestamps();
+    }
+
+    /**
+     * Menghitung persentase progres untuk satu Materi Utama
+     */
+    public function progressMateri($ruangMateriId)
+    {
+        // 1. Hitung total bab yang ada di materi ini
+        $totalBab = \App\Models\SubMateri::where('ruang_materi_id', $ruangMateriId)->count();
+        
+        if ($totalBab == 0) return 0;
+
+        // 2. Hitung berapa bab yang sudah diselesaikan oleh user ini di materi tersebut
+        $babSelesai = $this->subMaterisSelesai()
+                        ->where('ruang_materi_id', $ruangMateriId)
+                        ->count();
+
+        // 3. Kembalikan hasil dalam persen
+        return round(($babSelesai / $totalBab) * 100);
+    }
 }

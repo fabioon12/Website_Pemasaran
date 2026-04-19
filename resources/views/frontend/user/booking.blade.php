@@ -239,6 +239,102 @@
 </div>
 
 {{-- MODAL & SCRIPT (Tetap Sama Seperti Sebelumnya) --}}
+<div class="modal fade" id="rentNowModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg"> {{-- Menambahkan modal-lg agar lebih nyaman dibaca --}}
+        <div class="modal-content p-4">
+            <div class="modal-header border-0">
+                <h5 class="modal-title fw-800 text-uppercase">Confirm Archive Request</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            
+            <form action="{{ route('customer.booking.store', $product->id) }}" method="POST">
+                @csrf
+                <div class="modal-body">
+                    {{-- Hidden Inputs --}}
+                    <input type="hidden" name="start_date" id="start_date_input">
+                    <input type="hidden" name="end_date" id="end_date_input">
+                    <input type="hidden" name="duration" id="hiddenDurationInput">
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold text-uppercase text-muted">Selected Dates</label>
+                                <div id="modalDateRangeText" class="fw-bold fs-5"></div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold text-uppercase text-muted">Occasion</label>
+                                <input type="text" name="occasion" class="form-control rounded-0" placeholder="e.g. Photoshoot, Wedding" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold text-uppercase text-muted">Venue</label>
+                                <input type="text" name="venue" class="form-control rounded-0" placeholder="Location name" required>
+                            </div>
+
+                            <div class="bg-light p-3 mb-3">
+                                <div class="d-flex justify-content-between">
+                                    <span class="small fw-bold">TOTAL PRICE</span>
+                                    <span id="modalPriceLabel" class="fw-bold text-dark"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- BAGIAN SYARAT & KETENTUAN --}}
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-uppercase text-muted">Terms & Conditions</label>
+                            <div class="p-3 border mb-3" style="height: 350px; overflow-y: auto; font-size: 0.75rem; background-color: #fcfcfc;">
+                                
+                                <h6 class="fw-bold mb-2" style="font-size: 0.8rem; border-bottom: 1px solid #eee; padding-bottom: 5px;">Archive Responsibility & Usage</h6>
+                                
+                                <p class="fw-bold mb-1">1. Social Media Credit</p>
+                                <p class="text-muted">Penyewa wajib melakukan mention instagram desainer pada setiap postingan yang memperlihatkan karya busana tersebut.</p>
+
+                                <p class="fw-bold mb-1">2. Documentation</p>
+                                <p class="text-muted">Mendokumentasikan karya busana (foto/video) selama kegiatan dan mengirimkannya ke Instagram desainer masing-masing.</p>
+
+                                <p class="fw-bold mb-1">3. Care & Handling</p>
+                                <p class="text-muted">Dilarang mencuci sendiri atau melakukan modifikasi (memotong/menjahit/peniti). Mohon memakai busana dengan hati-hati dan tanpa paksaan.</p>
+
+                                <p class="fw-bold mb-1">4. Damage & Liability</p>
+                                <p class="text-muted">Penyewa bertanggung jawab penuh atas kondisi barang. Jika terdapat kerusakan, penyewa wajib membayar denda sesuai nilai kerusakan/restorasi yang terjadi.</p>
+
+                                <hr class="my-3">
+
+                                <h6 class="fw-bold mb-2" style="font-size: 0.8rem; border-bottom: 1px solid #eee; padding-bottom: 5px;">Rental Procedure</h6>
+
+                                <p class="fw-bold mb-1">5. Booking & Identity</p>
+                                <p class="text-muted">Konfirmasi penyewaan maksimal H-3. Penyewa wajib memberikan jaminan identitas (KTP/Paspor/KTM) yang akan dikembalikan saat barang kembali.</p>
+
+                                <p class="fw-bold mb-1">6. Rental Pricing</p>
+                                <p class="text-muted">Harga sewa berbeda tiap karya sesuai tingkat kesulitan sebagaimana tertera pada katalog.</p>
+
+                                <p class="fw-bold mb-1">7. Return Policy</p>
+                                <p class="text-muted">Pengembalian maksimal H+3 setelah kegiatan.</p>
+
+                                <p class="fw-bold mb-1">8. Late Return Penalty</p>
+                                <p class="text-muted">Keterlambatan tanpa konfirmasi dikenakan denda Rp 5.000 per hari, berlaku kelipatan per tiga hari selanjutnya.</p>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-check small mt-2">
+                        <input class="form-check-input" type="checkbox" id="agreeTerms" required>
+                        <label class="form-check-label text-muted" for="agreeTerms">
+                            I have read and agree to the <strong>Archive Terms</strong> and take full responsibility for this item.
+                        </label>
+                    </div>
+                </div>
+
+                <div class="modal-footer border-0">
+                    <button type="submit" id="btnConfirmPay" class="btn btn-dark w-100 py-3 fw-bold rounded-0" disabled>
+                        CONFIRM & PROCEED TO RENTAL
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 {{-- ... bagian modal dan script flatpickr ... --}}
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
